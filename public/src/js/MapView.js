@@ -251,7 +251,7 @@ app.MapView = function() {
      * @return {object} - JSON of the user's timeline
      */
     self.getTweets = function(hotel) {
-        var twitter_api_wrapper = 'http://topwidget.co/twitter/api.php';
+        var twitter_api_wrapper = 'http://widgets.ws/twitter/api.php';
         var data = {
             "screen_name": hotel.twitter,
             "count": 5
