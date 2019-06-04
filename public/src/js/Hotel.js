@@ -38,6 +38,7 @@ app.Hotel = function() {
      */
     self.init = function() {
         var hotelsRef;
+        var yelpRef;
         var hotel = [];
         var db;
         var firebaseConfig = {
@@ -81,6 +82,20 @@ app.Hotel = function() {
         })
         .catch(function(error) {
             var errMsg = "Error getting hotel data from Firebase: " + error;
+            app.vm.dispMsg(errMsg);
+        });
+
+        // Save yelp credentials
+        yelpRef = db.collection('yelp').doc("authentication");
+
+        yelpRef.get()
+        .then(function(doc) {
+            if(doc.exists) {
+                self.yelp = doc.data();
+            }
+        })
+        .catch(function(error) {
+            var errMsg = "Error getting yelp authentication from Firebase: " + error;
             app.vm.dispMsg(errMsg);
         });
 
