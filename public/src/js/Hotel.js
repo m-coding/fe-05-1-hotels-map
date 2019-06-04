@@ -21,8 +21,8 @@ app.Hotel = function() {
      * @property {string} id - Yelp business ID
      * @property {string} twitter - Twitter screen name
      * @property {object} location - Hotel coordinates
-     * @property {number} location.lat - Latitude
-     * @property {number} location.lng - Longitude
+     * @property {number} location._lat - Latitude
+     * @property {number} location._long - Longitude
      * @property {number} diamonds - Diamond rating of hotel
      */
 
@@ -31,50 +31,59 @@ app.Hotel = function() {
      *
      * @function app.Hotel.init
      * @memberof app.Hotel
-     * @see {@link https://www.firebase.com/docs/web/guide/retrieving-data.html#section-reading-once}
-     * @see {@link https://www.firebase.com/docs/web/api/query/once.html}
+     * @see {@link https://firebase.google.com/docs/web/setup}
+     * @see {@link https://firebase.google.com/docs/firestore/quickstart}
+     * @see {@link https://firebase.google.com/docs/firestore/query-data/get-data#get_all_documents_in_a_collection}
      * @returns {Hotels} - Hotel data in json notation
      */
     self.init = function() {
         var hotelsRef;
-        var hotelsJSON;
-        var i = 0;
         var hotel = [];
-        var length = 0;
+        var db;
+        var firebaseConfig = {
+            apiKey: "AIzaSyDAkU7fnDw-cOpyrXsRhMWCFeKbrNgvZGs",
+            authDomain: "zeta-time-122004.firebaseapp.com",
+            projectId: "zeta-time-122004",
+        };
 
         // Start the 10 second timer
         self.reqTimeout();
 
-        hotelsRef = new Firebase('https://crackling-heat-3113.firebaseio.com');
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
 
-        // Read the data only once
-        hotelsRef.once('value', function(dataSnapshot) {
+        // Cloud Firestore Database
+        db = firebase.firestore();
 
-            self.yelp = dataSnapshot.child('yelp').val();
+        // Get all the hotel documents from the hotels collection
+        hotelsRef = db.collection('hotels');
 
-            hotelsJSON = dataSnapshot.child('hotels').val();
+        hotelsRef.get()
+        .then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                // doc.data() is never undefined for query doc snapshots
+                // console.log( doc.id, " => ", doc.data() );
 
-            // Store all the hotel data in app.Hotel.hotels
-            length = hotelsJSON.length;
-            for (i; i < length; i++) {
-                hotel = hotelsJSON[i];
+                // Helpfuf info: https://stackoverflow.com/questions/52462129
+                hotel = doc.data();
+                hotel.id = doc.id;
                 hotel.content = null;
                 hotel.tweets = null;
 
                 // Save each hotel into a Knockout Observable Array
                 self.hotels.push(hotel);
-            }
 
-            // Initialize the map with the hotels
+            }); //querySnashot
+
+            // Initialize the map with the hotels.
             app.vm.init();
 
-        }, function (errorObject) {
-            // Called when client does not have permission to read this data
-            // This will ONLY display if Firebase rules for READ is set to FALSE
-            var errMsg = 'Error code: ' + errorObject.code + '. <br>';
-                errMsg += 'You do not have permission to read hotel data. Please contact the webmaster to gain access.';
+        })
+        .catch(function(error) {
+            var errMsg = "Error getting hotel data from Firebase: " + error;
             app.vm.dispMsg(errMsg);
         });
+
     }; // init
 
     /**
