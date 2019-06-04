@@ -1,92 +1,83 @@
 /* Reference only. This data is stored on remote Firebase server. */
 {
-    "hotels": [
-        {
+    "hotels": {
+        "aria-hotel-and-casino-las-vegas": {
             "name": "ARIA Resort and Casino Las Vegas",
-            "id": "aria-hotel-and-casino-las-vegas",
             "twitter": "AriaLV",
             "location": {"lat": 36.1066653, "lng": -115.1790977},
             "diamonds": 5
         },
-        {
+        "bellagio-hotel-las-vegas": {
             "name": "Bellagio Hotel and Casino",
-            "id": "bellagio-hotel-las-vegas",
             "twitter": "Bellagio",
             "location": {"lat": 36.1126307, "lng": -115.1788938},
             "diamonds": 5
         },
-        {   "name": "Four Seasons Hotel Las Vegas",
-            "id": "four-seasons-hotel-las-vegas-las-vegas",
+        "four-seasons-hotel-las-vegas-las-vegas": {
+            "name": "Four Seasons Hotel Las Vegas",
             "twitter": "FSLasVegas",
             "location": {"lat": 36.0914381, "lng": -115.1767325},
             "diamonds": 5
         },
-        {   "name": "Mandarin Oriental",
-            "id": "mandarin-oriental-las-vegas-las-vegas",
+        "mandarin-oriental-las-vegas-las-vegas": {
+            "name": "Mandarin Oriental",
             "twitter": "MO_LASVEGAS",
             "location": {"lat": 36.1061553, "lng": -115.176649},
             "diamonds": 5
         },
-        {   "name": "Wynn Las Vegas",
-            "id": "wynn-las-vegas-las-vegas-3",
+        "wynn-las-vegas-las-vegas-3": {
+            "name": "Wynn Las Vegas",
             "twitter": "WynnLasVegas",
             "location": {"lat": 36.1267281, "lng": -115.1678955},
             "diamonds": 5
         },
-        {   "name": "Mandalay Bay",
-            "id": "mandalay-bay-resort-and-casino-las-vegas-2",
+        "mandalay-bay-resort-and-casino-las-vegas-2": {
+            "name": "Mandalay Bay",
             "twitter": "MandalayBay",
             "location": {"lat": 36.091882, "lng": -115.1774337},
             "diamonds": 4
         },
-        {   "name": "MGM Grand",
-            "id": "mgm-grand-hotel-las-vegas",
+        "mgm-grand-hotel-las-vegas": {
+            "name": "MGM Grand",
             "twitter": "MGMGrand",
             "location": {"lat": 36.1025803, "lng": -115.172442},
             "diamonds": 4
         },
-        {   "name": "The Cosmopolitan of Las Vegas",
-            "id": "the-cosmopolitan-of-las-vegas-las-vegas",
+        "the-cosmopolitan-of-las-vegas-las-vegas": {
+            "name": "The Cosmopolitan of Las Vegas",
             "twitter": "Cosmopolitan_LV",
             "location": {"lat": 36.1097596, "lng": -115.1760656},
             "diamonds": 4
         },
-        {   "name": "New York-New York Hotel and Casino",
-            "id": "new-york-new-york-hotel-casino-las-vegas",
+        "new-york-new-york-hotel-casino-las-vegas": {
+            "name": "New York-New York Hotel and Casino",
             "twitter": "NYNYVegas",
             "location": {"lat": 36.1023758, "lng": -115.1767446},
             "diamonds": 3
         },
-        {   "name": "Luxor Hotel and Casino",
-            "id": "luxor-hotel-and-casino-las-vegas-las-vegas",
+        "luxor-hotel-and-casino-las-vegas-las-vegas": {
+            "name": "Luxor Hotel and Casino",
             "twitter": "LuxorLV",
             "location": {"lat": 36.0955143, "lng": -115.1782559},
             "diamonds": 3
         },
-        {   "name": "Hilton Grand Vacations on the Boulevard",
-            "id": "hilton-grand-vacations-on-the-boulevard-las-vegas",
+        "hilton-grand-vacations-on-the-boulevard-las-vegas": {
+            "name": "Hilton Grand Vacations on the Boulevard",
             "twitter": "HiltonGrandVac",
             "location": {"lat": 36.1400756, "lng": -115.1633779},
             "diamonds": 3
         },
-        {   "name": "Excalibur Hotel and Casino",
-            "id": "excalibur-hotel-las-vegas",
+        "excalibur-hotel-las-vegas": {
+            "name": "Excalibur Hotel and Casino",
             "twitter": "ExcaliburVegas",
             "location": {"lat": 36.0989865, "lng": -115.1776611},
             "diamonds": 2
         },
-        {   "name": "Flamingo Las Vegas",
-            "id": "flamingo-las-vegas-hotel-and-casino-las-vegas",
+        "flamingo-las-vegas-hotel-and-casino-las-vegas": {
+            "name": "Flamingo Las Vegas",
             "twitter": "FlamingoVegas",
             "location": {"lat": 36.1161222, "lng": -115.1746787},
             "diamonds": 2
         }
-    ],
-    "yelp":
-        {
-            "CONSUMER_KEY": "tM7LTGt1WEIJ3iwCYumghA",
-            "CONSUMER_SECRET": "M3g4ceCZ1MmlPdXF1rCLxnNwx-0",
-            "TOKEN": "Ymb_BcnWPkMD2o1PVXpsYT-nA4RdoPIH",
-            "TOKEN_SECRET": "3jZGM2V1CiZRYRjNrA7FIFQzV3U"
-        }
+    }
 }
