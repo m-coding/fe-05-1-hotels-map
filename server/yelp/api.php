@@ -100,6 +100,8 @@ function query_api($location) {
 /**
  * User input is handled here
  */
+header('content-type:application/json');
+
 $hotel = $_GET['hotel'];
 
 query_api($hotel);

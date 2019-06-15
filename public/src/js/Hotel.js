@@ -21,8 +21,8 @@ app.Hotel = function() {
      * @property {string} id - Yelp business ID
      * @property {string} twitter - Twitter screen name
      * @property {object} location - Hotel coordinates
-     * @property {number} location._lat - Latitude
-     * @property {number} location._long - Longitude
+     * @property {number} location.lat - Latitude
+     * @property {number} location.lng - Longitude
      * @property {number} diamonds - Diamond rating of hotel
      */
 
@@ -38,7 +38,6 @@ app.Hotel = function() {
      */
     self.init = function() {
         var hotelsRef;
-        var yelpRef;
         var hotel = [];
         var db;
         var firebaseConfig = {
@@ -65,7 +64,7 @@ app.Hotel = function() {
                 // doc.data() is never undefined for query doc snapshots
                 // console.log( doc.id, " => ", doc.data() );
 
-                // Helpfuf info: https://stackoverflow.com/questions/52462129
+                // Helpful info: https://stackoverflow.com/questions/52462129
                 hotel = doc.data();
                 hotel.id = doc.id;
                 hotel.content = null;
@@ -82,20 +81,6 @@ app.Hotel = function() {
         })
         .catch(function(error) {
             var errMsg = "Error getting hotel data from Firebase: " + error;
-            app.vm.dispMsg(errMsg);
-        });
-
-        // Save yelp credentials
-        yelpRef = db.collection('yelp').doc("authentication");
-
-        yelpRef.get()
-        .then(function(doc) {
-            if(doc.exists) {
-                self.yelp = doc.data();
-            }
-        })
-        .catch(function(error) {
-            var errMsg = "Error getting yelp authentication from Firebase: " + error;
             app.vm.dispMsg(errMsg);
         });
 

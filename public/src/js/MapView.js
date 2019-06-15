@@ -128,21 +128,33 @@ app.MapView = function() {
     self.setInfoWin = function(hotel) {
         // Open the infoWindow when a marker is clicked
         google.maps.event.addListener(hotel.marker, 'click', function() {
+
+            // Show preload if hotel content not cached yet
+            if(!hotel.content) self.infoWindow.setContent(self.preload);
+
+            // Load Twitter and Yelp content
+            self.loadContent(hotel);
+
+
+            /*
             if(!hotel.content) {
                 self.infoWindow.setContent(self.preload);
                 self.getContent(hotel);
             }
             else
                 self.infoWindow.setContent(hotel.content);
+            */
 
-            self.infoWindow.open(self.map, hotel.marker);
-            self.animateMarker(hotel);
-            self.currentLocation = hotel.location;
-
+            /*
             if(!hotel.tweets)
                 self.getTweets(hotel);
             else
                 self.displayTweets(hotel.tweets);
+            */
+
+            self.infoWindow.open(self.map, hotel.marker);
+            self.animateMarker(hotel);
+            self.currentLocation = hotel.location;
 
             // Re-center the map on the marker that was clicked
             self.map.setCenter(hotel.location);
@@ -154,59 +166,41 @@ app.MapView = function() {
     }; // setInfoWin
 
     /**
-     * Calls the Yelp API via JSONP AJAX and sets the content of the infoWindow.
+     * Make Yelp & Twitter API requests through a Promise
      *
-     * @function app.MapView.getContent
+     * @function app.MapView.loadContent
      * @memberof app.MapView
      */
-    self.getContent = function(hotel) {
-        /**
-         * Generates a random number and returns it as a string for OAuthentication
-         * @return {string}
-         */
-        function nonce_generate() {
-          return (Math.floor(Math.random() * 1e12).toString());
-        }
-
-        // Proof of concept of how to connect to an oAuth API with JS
-        // For real world use you'd want a backend that hides your keys
-        var yelpUrl = 'http://api.yelp.com/v2/business/' + hotel.id;
-        var auth = app.vm.getKeys();
-        var parameters = {
-          oauth_consumer_key: auth.CONSUMER_KEY,
-          oauth_token: auth.TOKEN,
-          oauth_nonce: nonce_generate(),
-          oauth_timestamp: Math.floor(Date.now() / 1000),
-          oauth_signature_method: 'HMAC-SHA1',
-          oauth_version: '1.0',
-          callback: 'cb'
+    self.loadContent = function(hotel) {
+        var yelpParams = {
+                "hotel": hotel.id,
         };
-        var encodedSignature = oauthSignature.generate('GET',
-                                                        yelpUrl,
-                                                        parameters,
-                                                        auth.CONSUMER_SECRET,
-                                                        auth.TOKEN_SECRET);
-        parameters.oauth_signature = encodedSignature;
 
-        $jsonp.send(yelpUrl, {
-            callbackName: 'cb',
-            data: parameters,
-            onSuccess: function(json){
-                hotel.content = self.getTemplate(hotel.name,
-                                                 hotel.diamonds,
-                                                 json.image_url,
-                                                 json.snippet_text,
-                                                 json.url);
-                self.infoWindow.setContent(hotel.content);
-            },
-            onTimeout: function(){
-                hotel.content = null;
-                self.infoWindow.setContent('Error retrieving Yelp data.<br>Please try again.');
-            },
-                timeout: 5
+        var twitterParams = {
+            "screen_name": hotel.twitter,
+            "count": 5
+        };
+
+        // Send GET request to Yelp API
+        getJSON('http://widgets.ws/yelp/api.php', {
+            method: 'GET',
+            apiquery: yelpParams,
+        })
+        .then(function (json) {
+            console.log("inside then function");
+            hotel.content = self.getTemplate(hotel.name,
+                                            hotel.diamonds,
+                                            json.image_url,
+                                            "review goes here",
+                                            json.url);
+            self.infoWindow.setContent(hotel.content);
+        })
+        .catch(function (error) {
+            console.log("inside catch function");
+            console.log(error.status);
+            console.log(error.statusText);
         });
-
-    }; // getContent
+    }; // loadContent
 
     /**
      * Matches the icon to diamond rating and formats html for the hotel image and review snippet.
@@ -258,6 +252,7 @@ app.MapView = function() {
         };
 
         // url, method, data, success, fail
+        console.log("START: TWITTER AJAX");
         AJAX.request(twitter_api_wrapper, 'GET', data, function(response) {
             var tweets = '';
             var length = response.length;
@@ -289,6 +284,7 @@ app.MapView = function() {
             self.displayTweets(msg);
             if(window.console) console.log("AJAX GET request failed.");
         });
+        console.log("END: TWITTER AJAX");
 
     }; // getTweets
 
