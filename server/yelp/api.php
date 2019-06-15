@@ -85,15 +85,36 @@ function get_business($business_id) {
 }
 
 /**
+ * Query the Business API by business_id
+ *
+ * @param    $business_id    The ID of the business to query
+ * @return   The JSON response from the request
+ */
+function get_reviews($business_id) {
+    $business_path = $GLOBALS['BUSINESS_PATH'] . urlencode($business_id) . '/reviews';
+
+    return request($GLOBALS['API_HOST'], $business_path);
+}
+
+/**
  * Queries the API by the input values from the user
  *
  * @param    $location    The location of the business to query
  */
 function query_api($location) {
 
-    $response = get_business($location);
+    // Get business name, image, url
+    $responseDetails = get_business($location);
 
-    $pretty_response = json_encode(json_decode($response), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    // Get business reviews
+    $responseReviews = get_reviews($location);
+
+    // Merge JSON
+    $result = array();
+    $result[] = json_decode($responseDetails, true);
+    $result[] = json_decode($responseReviews, true);
+
+    $pretty_response = json_encode( $result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     print "$pretty_response\n";
 }
 

@@ -187,18 +187,16 @@ app.MapView = function() {
             apiquery: yelpParams,
         })
         .then(function (json) {
-            console.log("inside then function");
             hotel.content = self.getTemplate(hotel.name,
                                             hotel.diamonds,
-                                            json.image_url,
-                                            "review goes here",
-                                            json.url);
+                                            json[0].image_url,
+                                            json[1].reviews[0].text,
+                                            json[1].reviews[0].url);
             self.infoWindow.setContent(hotel.content);
         })
         .catch(function (error) {
-            console.log("inside catch function");
-            console.log(error.status);
-            console.log(error.statusText);
+            if(window.console) console.log(error.status);
+            if(window.console) console.log(error.statusText);
         });
     }; // loadContent
 
