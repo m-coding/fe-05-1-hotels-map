@@ -129,28 +129,16 @@ app.MapView = function() {
         // Open the infoWindow when a marker is clicked
         google.maps.event.addListener(hotel.marker, 'click', function() {
 
-            // Show preload if hotel content not cached yet
-            if(!hotel.content) self.infoWindow.setContent(self.preload);
-
-            // Load Twitter and Yelp content
-            self.loadContent(hotel);
-
-
-            /*
             if(!hotel.content) {
+                // Show preload text inside the Info Window
                 self.infoWindow.setContent(self.preload);
-                self.getContent(hotel);
-            }
-            else
-                self.infoWindow.setContent(hotel.content);
-            */
 
-            /*
-            if(!hotel.tweets)
-                self.getTweets(hotel);
-            else
+                // Load Yelp and Twitter content
+                self.loadContent(hotel);
+            } else {
+                self.infoWindow.setContent(hotel.review);
                 self.displayTweets(hotel.tweets);
-            */
+            }
 
             self.infoWindow.open(self.map, hotel.marker);
             self.animateMarker(hotel);
@@ -172,42 +160,77 @@ app.MapView = function() {
      * @memberof app.MapView
      */
     self.loadContent = function(hotel) {
+
+         // Send GET request to Yelp API
         var yelpParams = {
                 "hotel": hotel.id,
         };
 
+        var yelpRequest = getJSON('http://widgets.ws/yelp/api.php', {
+            method: 'GET',
+            apiquery: yelpParams,
+        })
+        .then(function (json) {
+            hotel.review = self.getYelpTemplate(hotel.name,
+                                            hotel.diamonds,
+                                            json[0].image_url,
+                                            json[1].reviews[0].text,
+                                            json[1].reviews[0].url);
+            self.infoWindow.setContent(hotel.review);
+            hotel.content = true;
+            return Promise.resolve('Yelp API Success');
+        })
+        .catch(function (error) {
+            hotel.content = null;
+            self.infoWindow.setContent('Error retrieving Yelp data.<br>Please try again.');
+            // Ref: https://medium.com/datafire-io/es6-promises-patterns-and-anti-patterns-bbb21a5d0918
+            return Promise.reject(new Error("Yelp API: " + error.status + " " + error.statusText));
+        });
+
+        // Send GET request to Twitter API
         var twitterParams = {
             "screen_name": hotel.twitter,
             "count": 5
         };
 
-        // Send GET request to Yelp API
-        getJSON('http://widgets.ws/yelp/api.php', {
+        var twitterRequest = getJSON('http://widgets.ws/twitter/api.php', {
             method: 'GET',
-            apiquery: yelpParams,
+            apiquery: twitterParams,
         })
         .then(function (json) {
-            hotel.content = self.getTemplate(hotel.name,
-                                            hotel.diamonds,
-                                            json[0].image_url,
-                                            json[1].reviews[0].text,
-                                            json[1].reviews[0].url);
-            self.infoWindow.setContent(hotel.content);
+            hotel.tweets = self.getTweets(hotel, json);
+            self.displayTweets(hotel.tweets);
+            return Promise.resolve('Twitter API Success');
         })
         .catch(function (error) {
-            if(window.console) console.log(error.status);
-            if(window.console) console.log(error.statusText);
+            var url = 'https://twitter.com/' + hotel.twitter;
+            var msg = '<li><a href="' + url + '" target="_blank">Failed to load recent tweets for @';
+                msg += hotel.twitter + '. Click here to view tweets on twitter.com.</a></li>';
+            hotel.tweets = null;
+            self.displayTweets(msg);
+            return Promise.reject(new Error("Twitter API: " + error.status + " " + error.statusText));
         });
+
+        // Track when all the API requests are complete using Promise.all and catch any errors
+        // Ref: http://adampaxton.com/handling-multiple-javascript-promises-even-if-some-fail/
+        Promise.all([yelpRequest, twitterRequest])
+        .then(function (res) {
+            if(window.console) console.log('GET request results', res);
+        })
+        .catch(function (err) {
+            if(window.console) console.error('GET request failed with', err);
+        });
+
     }; // loadContent
 
     /**
      * Matches the icon to diamond rating and formats html for the hotel image and review snippet.
      *
-     * @function app.MapView.getTemplate
+     * @function app.MapView.getYelpTemplate
      * @memberof app.MapView
      * @returns {string} - HTML containing hotel name, diamond rating, image, and review.
      */
-    self.getTemplate = function(name, diamonds, image, review, url) {
+    self.getYelpTemplate = function(name, diamonds, image, review, url) {
         var i = 0;
         var d = app.vm.getRatings();
         var dlength = d.length;
@@ -233,7 +256,7 @@ app.MapView = function() {
         template += '</div>';
 
         return template;
-    }; // getTemplate
+    }; // getYelpTemplate
 
     /**
      * Sends a GET request to api.php which accesses the Twitter API and returns JSON data.
@@ -242,16 +265,7 @@ app.MapView = function() {
      * @memberof app.MapView
      * @return {object} - JSON of the user's timeline
      */
-    self.getTweets = function(hotel) {
-        var twitter_api_wrapper = 'http://widgets.ws/twitter/api.php';
-        var data = {
-            "screen_name": hotel.twitter,
-            "count": 5
-        };
-
-        // url, method, data, success, fail
-        console.log("START: TWITTER AJAX");
-        AJAX.request(twitter_api_wrapper, 'GET', data, function(response) {
+    self.getTweets = function(hotel, response) {
             var tweets = '';
             var length = response.length;
             var t = 0;
@@ -271,18 +285,7 @@ app.MapView = function() {
                 tweets += '</li>';
             } // for
 
-            hotel.tweets = tweets;
-            self.displayTweets(hotel.tweets);
-
-        },function(){
-            var url = 'https://twitter.com/' + hotel.twitter;
-            var msg = '<li><a href="' + url + '" target="_blank">Failed to load recent tweets for @';
-                msg += hotel.twitter + '. Click here to view tweets on twitter.com.</a></li>';
-            hotel.tweets = null;
-            self.displayTweets(msg);
-            if(window.console) console.log("AJAX GET request failed.");
-        });
-        console.log("END: TWITTER AJAX");
+            return tweets;
 
     }; // getTweets
 

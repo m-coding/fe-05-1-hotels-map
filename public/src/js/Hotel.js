@@ -68,6 +68,7 @@ app.Hotel = function() {
                 hotel = doc.data();
                 hotel.id = doc.id;
                 hotel.content = null;
+                hotel.review = null;
                 hotel.tweets = null;
 
                 // Save each hotel into a Knockout Observable Array
