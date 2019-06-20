@@ -1,3 +1,5 @@
+/*eslint-env es6 */
+
 /**
  * A Promise based XHR function to get JSON data from external APIs
  *

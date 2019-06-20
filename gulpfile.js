@@ -10,7 +10,7 @@ var gulp = require('gulp'),
 
 
 /** Default **/
-gulp.task('default', ['lint', 'replace-html', 'copy-js', 'copy-fonts', 'copy-images']);
+gulp.task('default', ['lint', 'replace-html', 'copy-fonts', 'copy-images']);
 
 /** Clean Distribution Folder **/
 gulp.task('clean', function() {
@@ -26,7 +26,7 @@ gulp.task('cleanDryRun', function() {
 /** JavasScript Linter **/
 gulp.task('lint', function () {
     return gulp.src(['public/src/js/app.js',
-                     'public/src/js/ajax.js',
+                     'public/src/js/xhrPromise.js',
                      'public/src/js/Hotel.js',
                      'public/src/js/ViewModel.js',
                      'public/src/js/MapView.js'])
@@ -45,12 +45,7 @@ gulp.task('replace-html', ['lint'], function() {
 });
 
 /** COPY **/
-gulp.task('copy-js', ['replace-html'], function() {
-    return gulp.src('public/src/js/lib/oauth-signature.min.js')
-        .pipe(gulp.dest('public/dist/js/lib'));
-});
-
-gulp.task('copy-fonts', ['copy-js'], function() {
+gulp.task('copy-fonts', ['replace-html'], function() {
     return gulp.src('public/src/fonts/*.*')
         .pipe(gulp.dest('public/dist/fonts'));
 });
