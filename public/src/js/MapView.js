@@ -166,7 +166,7 @@ app.MapView = function() {
                 "hotel": hotel.id,
         };
 
-        var yelpRequest = getJSON('http://widgets.ws/yelp/api.php', {
+        var yelpRequest = getJSON('https://widgets.ws/yelp/api.php', {
             method: 'GET',
             apiquery: yelpParams,
         })
@@ -193,7 +193,7 @@ app.MapView = function() {
             "count": 5
         };
 
-        var twitterRequest = getJSON('http://widgets.ws/twitter/api.php', {
+        var twitterRequest = getJSON('https://widgets.ws/twitter/api.php', {
             method: 'GET',
             apiquery: twitterParams,
         })
