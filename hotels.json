@@ -19,10 +19,10 @@
             "location": {"lat": 36.0914381, "lng": -115.1767325},
             "diamonds": 5
         },
-        "mandarin-oriental-las-vegas-las-vegas": {
-            "name": "Mandarin Oriental",
-            "twitter": "MO_LASVEGAS",
-            "location": {"lat": 36.1061553, "lng": -115.176649},
+        "waldorf-astoria-las-vegas-las-vegas-2": {
+            "name": "Waldorf Astoria Las Vegas",
+            "twitter": "WA_LasVegas",
+            "location": {"lat": 36.1059747, "lng": -115.17465},
             "diamonds": 5
         },
         "wynn-las-vegas-las-vegas-3": {
