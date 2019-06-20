@@ -156,21 +156,13 @@ app.MapView = function() {
     self.setInfoWin = function(hotel) {
         // Open the infoWindow when a marker is clicked
         google.maps.event.addListener(hotel.marker, 'click', function() {
-            if(!hotel.content) {
-                self.infoWindow.setContent(self.preload);
-                self.getContent(hotel);
-            }
-            else
-                self.infoWindow.setContent(hotel.content);
+
+            // Load Yelp and Twitter content
+            self.loadContent(hotel);
 
             self.infoWindow.open(self.map, hotel.marker);
             self.animateMarker(hotel);
             self.currentLocation = hotel.location;
-
-            if(!hotel.tweets)
-                self.getTweets(hotel);
-            else
-                self.displayTweets(hotel.tweets);
 
             // Re-center the map on the marker that was clicked
             self.map.setCenter(hotel.location);
@@ -182,68 +174,93 @@ app.MapView = function() {
     }; // setInfoWin
 
     /**
-     * Calls the Yelp API via JSONP AJAX and sets the content of the infoWindow.
+     * Make Yelp &amp; Twitter API requests through a Promise
      *
-     * @function app.MapView.getContent
+     * @function app.MapView.loadContent
      * @memberof app.MapView
      */
-    self.getContent = function(hotel) {
-        /**
-         * Generates a random number and returns it as a string for OAuthentication
-         * @return {string}
-         */
-        function nonce_generate() {
-          return (Math.floor(Math.random() * 1e12).toString());
-        }
-
-        // Proof of concept of how to connect to an oAuth API with JS
-        // For real world use you'd want a backend that hides your keys
-        var yelpUrl = 'http://api.yelp.com/v2/business/' + hotel.id;
-        var auth = app.vm.getKeys();
-        var parameters = {
-          oauth_consumer_key: auth.CONSUMER_KEY,
-          oauth_token: auth.TOKEN,
-          oauth_nonce: nonce_generate(),
-          oauth_timestamp: Math.floor(Date.now() / 1000),
-          oauth_signature_method: 'HMAC-SHA1',
-          oauth_version: '1.0',
-          callback: 'cb'
+    self.loadContent = function(hotel) {
+        var  yelpParams = {
+                    "hotel": hotel.id,
         };
-        var encodedSignature = oauthSignature.generate('GET',
-                                                        yelpUrl,
-                                                        parameters,
-                                                        auth.CONSUMER_SECRET,
-                                                        auth.TOKEN_SECRET);
-        parameters.oauth_signature = encodedSignature;
+        var  twitterParams = {
+            "screen_name": hotel.twitter,
+            "count": 50
+        };
+        var yelpRequest;
+        var twitterRequest;
 
-        $jsonp.send(yelpUrl, {
-            callbackName: 'cb',
-            data: parameters,
-            onSuccess: function(json){
-                hotel.content = self.getTemplate(hotel.name,
-                                                 hotel.diamonds,
-                                                 json.image_url,
-                                                 json.snippet_text,
-                                                 json.url);
-                self.infoWindow.setContent(hotel.content);
-            },
-            onTimeout: function(){
+        if(!hotel.content) {
+            // Show preload text inside the Info Window
+            self.infoWindow.setContent(self.preload);
+
+            // Send GET request to Yelp API
+            yelpRequest = getJSON('https://widgets.ws/yelp/api.php', {
+                method: 'GET',
+                apiquery: yelpParams,
+            })
+            .then(function (json) {
+                hotel.review = self.getYelpTemplate(hotel.name,
+                                                hotel.diamonds,
+                                                json[0].image_url,
+                                                json[1].reviews[0].text,
+                                                json[1].reviews[0].url);
+                self.infoWindow.setContent(hotel.review);
+                hotel.content = true;
+                return Promise.resolve('Yelp API Success');
+            })
+            .catch(function (error) {
                 hotel.content = null;
                 self.infoWindow.setContent('Error retrieving Yelp data.&lt;br>Please try again.');
-            },
-                timeout: 5
+                // Ref: https://medium.com/datafire-io/es6-promises-patterns-and-anti-patterns-bbb21a5d0918
+                return Promise.reject(new Error("Yelp API: " + error.status + " " + error.statusText));
+            });
+
+        } else
+            self.infoWindow.setContent(hotel.review);
+
+        if(!hotel.tweets) {
+            // Send GET request to Twitter API
+            twitterRequest = getJSON('https://widgets.ws/twitter/api.php', {
+                method: 'GET',
+                apiquery: twitterParams,
+            })
+            .then(function (json) {
+                hotel.tweets = self.getTweets(hotel, json);
+                self.displayTweets(hotel.tweets);
+                return Promise.resolve('Twitter API Success');
+            })
+            .catch(function (error) {
+                var url = 'https://twitter.com/' + hotel.twitter;
+                var msg = '&lt;li>&lt;a href="' + url + '" target="_blank">Failed to load recent tweets for @';
+                    msg += hotel.twitter + '. Click here to view tweets on twitter.com.&lt;/a>&lt;/li>';
+                hotel.tweets = null;
+                self.displayTweets(msg);
+                return Promise.reject(new Error("Twitter API: " + error.status + " " + error.statusText));
+            });
+        } else
+            self.displayTweets(hotel.tweets);
+
+        // Track when all the API requests are complete using Promise.all and catch any errors
+        // Ref: http://adampaxton.com/handling-multiple-javascript-promises-even-if-some-fail/
+        Promise.all([yelpRequest, twitterRequest])
+        .then(function (res) {
+            if(window.console) console.log('GET request results', res);
+        })
+        .catch(function (err) {
+            if(window.console) console.error('GET request failed with', err);
         });
 
-    }; // getContent
+    }; // loadContent
 
     /**
      * Matches the icon to diamond rating and formats html for the hotel image and review snippet.
      *
-     * @function app.MapView.getTemplate
+     * @function app.MapView.getYelpTemplate
      * @memberof app.MapView
      * @returns {string} - HTML containing hotel name, diamond rating, image, and review.
      */
-    self.getTemplate = function(name, diamonds, image, review, url) {
+    self.getYelpTemplate = function(name, diamonds, image, review, url) {
         var i = 0;
         var d = app.vm.getRatings();
         var dlength = d.length;
@@ -269,7 +286,7 @@ app.MapView = function() {
         template += '&lt;/div>';
 
         return template;
-    }; // getTemplate
+    }; // getYelpTemplate
 
     /**
      * Sends a GET request to api.php which accesses the Twitter API and returns JSON data.
@@ -278,15 +295,7 @@ app.MapView = function() {
      * @memberof app.MapView
      * @return {object} - JSON of the user's timeline
      */
-    self.getTweets = function(hotel) {
-        var twitter_api_wrapper = 'http://topwidget.co/twitter/api.php';
-        var data = {
-            "screen_name": hotel.twitter,
-            "count": 5
-        };
-
-        // url, method, data, success, fail
-        AJAX.request(twitter_api_wrapper, 'GET', data, function(response) {
+    self.getTweets = function(hotel, response) {
             var tweets = '';
             var length = response.length;
             var t = 0;
@@ -294,6 +303,9 @@ app.MapView = function() {
             var img = '';
             var id = '';
             var url = 'https://twitter.com/' + hotel.twitter + '/status/';
+
+            // Limit to 5 tweets
+            if (length > 5) length = 5;
 
             for(t; t &lt; length; t++) {
                 id = response[t].id_str;
@@ -306,17 +318,7 @@ app.MapView = function() {
                 tweets += '&lt;/li>';
             } // for
 
-            hotel.tweets = tweets;
-            self.displayTweets(hotel.tweets);
-
-        },function(){
-            var url = 'https://twitter.com/' + hotel.twitter;
-            var msg = '&lt;li>&lt;a href="' + url + '" target="_blank">Failed to load recent tweets for @';
-                msg += hotel.twitter + '. Click here to view tweets on twitter.com.&lt;/a>&lt;/li>';
-            hotel.tweets = null;
-            self.displayTweets(msg);
-            if(window.console) console.log("AJAX GET request failed.");
-        });
+            return tweets;
 
     }; // getTweets
 
@@ -342,13 +344,13 @@ app.MapView = function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="app.Hotel.html">Hotel</a></li><li><a href="app.MapView.html">MapView</a></li><li><a href="app.ViewModel.html">ViewModel</a></li></ul><h3>Namespaces</h3><ul><li><a href="app.html">app</a></li></ul><h3>Global</h3><ul><li><a href="global.html#$jsonp">$jsonp</a></li><li><a href="global.html#AJAX">AJAX</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="app.html">app</a></li></ul><h3>Classes</h3><ul><li><a href="app.Hotel.html">Hotel</a></li><li><a href="app.MapView.html">MapView</a></li><li><a href="app.ViewModel.html">ViewModel</a></li></ul><h3>Global</h3><ul><li><a href="global.html#getJSON">getJSON</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sat Mar 05 2016 21:14:00 GMT-0800 (Pacific Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Wed Jun 19 2019 21:18:02 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

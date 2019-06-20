@@ -35,13 +35,13 @@
                 </a>
               
                 
-                <a class="source" href="ajax.html">
-                  ajax.js
+                <a class="source" href="app.html">
+                  app.js
                 </a>
               
                 
-                <a class="source" href="app.html">
-                  app.js
+                <a class="source" href="xhrPromise.html">
+                  xhrPromise.js
                 </a>
               
             </div>
@@ -101,16 +101,20 @@ app.Hotel = <span class="hljs-function"><span class="hljs-keyword">function</spa
      *
      * @function app.Hotel.init
      * @memberof app.Hotel
-     * @see {@link https://www.firebase.com/docs/web/guide/retrieving-data.html#section-reading-once}
-     * @see {@link https://www.firebase.com/docs/web/api/query/once.html}
+     * @see {@link https://firebase.google.com/docs/web/setup}
+     * @see {@link https://firebase.google.com/docs/firestore/quickstart}
+     * @see {@link https://firebase.google.com/docs/firestore/query-data/get-data#get_all_documents_in_a_collection}
      * @returns {Hotels} - Hotel data in json notation
      */</span>
     self.init = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">var</span> hotelsRef;
-        <span class="hljs-keyword">var</span> hotelsJSON;
-        <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>;
         <span class="hljs-keyword">var</span> hotel = [];
-        <span class="hljs-keyword">var</span> length = <span class="hljs-number">0</span>;</pre></div></div>
+        <span class="hljs-keyword">var</span> db;
+        <span class="hljs-keyword">var</span> firebaseConfig = {
+            apiKey: <span class="hljs-string">"AIzaSyDAkU7fnDw-cOpyrXsRhMWCFeKbrNgvZGs"</span>,
+            authDomain: <span class="hljs-string">"zeta-time-122004.firebaseapp.com"</span>,
+            projectId: <span class="hljs-string">"zeta-time-122004"</span>,
+        };</pre></div></div>
             
         </li>
         
@@ -125,9 +129,7 @@ app.Hotel = <span class="hljs-function"><span class="hljs-keyword">function</spa
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        self.reqTimeout();
-
-        hotelsRef = <span class="hljs-keyword">new</span> Firebase(<span class="hljs-string">'https://crackling-heat-3113.firebaseio.com'</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        self.reqTimeout();</pre></div></div>
             
         </li>
         
@@ -138,15 +140,11 @@ app.Hotel = <span class="hljs-function"><span class="hljs-keyword">function</spa
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Read the data only once</p>
+              <p>Initialize Firebase</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        hotelsRef.once(<span class="hljs-string">'value'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">dataSnapshot</span>) </span>{
-
-            self.yelp = dataSnapshot.child(<span class="hljs-string">'yelp'</span>).val();
-
-            hotelsJSON = dataSnapshot.child(<span class="hljs-string">'hotels'</span>).val();</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        firebase.initializeApp(firebaseConfig);</pre></div></div>
             
         </li>
         
@@ -157,15 +155,11 @@ app.Hotel = <span class="hljs-function"><span class="hljs-keyword">function</spa
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Store all the hotel data in app.Hotel.hotels</p>
+              <p>Cloud Firestore Database</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            length = hotelsJSON.length;
-            <span class="hljs-keyword">for</span> (i; i &lt; length; i++) {
-                hotel = hotelsJSON[i];
-                hotel.content = <span class="hljs-literal">null</span>;
-                hotel.tweets = <span class="hljs-literal">null</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        db = firebase.firestore();</pre></div></div>
             
         </li>
         
@@ -176,12 +170,15 @@ app.Hotel = <span class="hljs-function"><span class="hljs-keyword">function</spa
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>Save each hotel into a Knockout Observable Array</p>
+              <p>Get all the hotel documents from the hotels collection</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                self.hotels.push(hotel);
-            }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        hotelsRef = db.collection(<span class="hljs-string">'hotels'</span>);
+
+        hotelsRef.get()
+        .then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">querySnapshot</span>) </span>{
+            querySnapshot.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -192,13 +189,10 @@ app.Hotel = <span class="hljs-function"><span class="hljs-keyword">function</spa
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Initialize the map with the hotels</p>
+              <p>doc.data() is never undefined for query doc snapshots
+console.log( doc.id, “ =&gt; “, doc.data() );</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>            app.vm.init();
-
-        }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">errorObject</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -209,15 +203,54 @@ app.Hotel = <span class="hljs-function"><span class="hljs-keyword">function</spa
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Called when client does not have permission to read this data
-This will ONLY display if Firebase rules for READ is set to FALSE</p>
+              <p>Helpful info: <a href="https://stackoverflow.com/questions/52462129">https://stackoverflow.com/questions/52462129</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">var</span> errMsg = <span class="hljs-string">'Error code: '</span> + errorObject.code + <span class="hljs-string">'. &lt;br&gt;'</span>;
-                errMsg += <span class="hljs-string">'You do not have permission to read hotel data. Please contact the webmaster to gain access.'</span>;
+            <div class="content"><div class='highlight'><pre>                hotel = doc.data();
+                hotel.id = doc.id;
+                hotel.content = <span class="hljs-literal">null</span>;
+                hotel.review = <span class="hljs-literal">null</span>;
+                hotel.tweets = <span class="hljs-literal">null</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Save each hotel into a Knockout Observable Array</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                self.hotels.push(hotel);
+
+            }); <span class="hljs-comment">//querySnashot</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Initialize the map with the hotels.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            app.vm.init();
+
+        })
+        .catch(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+            <span class="hljs-keyword">var</span> errMsg = <span class="hljs-string">"Error getting hotel data from Firebase: "</span> + error;
             app.vm.dispMsg(errMsg);
         });
+
     }; <span class="hljs-comment">// init</span>
 
     <span class="hljs-comment">/**
@@ -231,11 +264,11 @@ This will ONLY display if Firebase rules for READ is set to FALSE</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>This will display if client cannot connect to Firebase after 10 seconds</p>
 
@@ -247,11 +280,11 @@ This will ONLY display if Firebase rules for READ is set to FALSE</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>Check to see if the hotel data is loaded and display error message if no hotels</p>
 

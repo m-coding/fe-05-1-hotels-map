@@ -35,13 +35,13 @@
                 </a>
               
                 
-                <a class="source" href="ajax.html">
-                  ajax.js
+                <a class="source" href="app.html">
+                  app.js
                 </a>
               
                 
-                <a class="source" href="app.html">
-                  app.js
+                <a class="source" href="xhrPromise.html">
+                  xhrPromise.js
                 </a>
               
             </div>
@@ -76,8 +76,8 @@
  * @class MapView
  * @memberof app
  */</span>
-app.MapView = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{<span class="hljs-meta">
-    'use strict'</span>;
+app.MapView = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+<span class="hljs-meta">    'use strict'</span>;
 
     <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
 
@@ -368,22 +368,7 @@ app.MapView = <span class="hljs-function"><span class="hljs-keyword">function</s
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        google.maps.event.addListener(hotel.marker, <span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            <span class="hljs-keyword">if</span>(!hotel.content) {
-                self.infoWindow.setContent(self.preload);
-                self.getContent(hotel);
-            }
-            <span class="hljs-keyword">else</span>
-                self.infoWindow.setContent(hotel.content);
-
-            self.infoWindow.open(self.map, hotel.marker);
-            self.animateMarker(hotel);
-            self.currentLocation = hotel.location;
-
-            <span class="hljs-keyword">if</span>(!hotel.tweets)
-                self.getTweets(hotel);
-            <span class="hljs-keyword">else</span>
-                self.displayTweets(hotel.tweets);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        google.maps.event.addListener(hotel.marker, <span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{</pre></div></div>
             
         </li>
         
@@ -394,11 +379,15 @@ app.MapView = <span class="hljs-function"><span class="hljs-keyword">function</s
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>Re-center the map on the marker that was clicked</p>
+              <p>Load Yelp and Twitter content</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            self.map.setCenter(hotel.location);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            self.loadContent(hotel);
+
+            self.infoWindow.open(self.map, hotel.marker);
+            self.animateMarker(hotel);
+            self.currentLocation = hotel.location;</pre></div></div>
             
         </li>
         
@@ -408,6 +397,21 @@ app.MapView = <span class="hljs-function"><span class="hljs-keyword">function</s
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Re-center the map on the marker that was clicked</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            self.map.setCenter(hotel.location);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>On small screens pan the map down 120px</p>
 
@@ -419,85 +423,23 @@ app.MapView = <span class="hljs-function"><span class="hljs-keyword">function</s
     }; <span class="hljs-comment">// setInfoWin</span>
 
     <span class="hljs-comment">/**
-     * Calls the Yelp API via JSONP AJAX and sets the content of the infoWindow.
+     * Make Yelp &amp; Twitter API requests through a Promise
      *
-     * @function app.MapView.getContent
+     * @function app.MapView.loadContent
      * @memberof app.MapView
      */</span>
-    self.getContent = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">hotel</span>) </span>{
-        <span class="hljs-comment">/**
-         * Generates a random number and returns it as a string for OAuthentication
-         * @return {string}
-         */</span>
-        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">nonce_generate</span>(<span class="hljs-params"></span>) </span>{
-          <span class="hljs-keyword">return</span> (<span class="hljs-built_in">Math</span>.floor(<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">1e12</span>).toString());
-        }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
-              </div>
-              <p>Proof of concept of how to connect to an oAuth API with JS
-For real world use you’d want a backend that hides your keys</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> yelpUrl = <span class="hljs-string">'http://api.yelp.com/v2/business/'</span> + hotel.id;
-        <span class="hljs-keyword">var</span> auth = app.vm.getKeys();
-        <span class="hljs-keyword">var</span> parameters = {
-          oauth_consumer_key: auth.CONSUMER_KEY,
-          oauth_token: auth.TOKEN,
-          oauth_nonce: nonce_generate(),
-          oauth_timestamp: <span class="hljs-built_in">Math</span>.floor(<span class="hljs-built_in">Date</span>.now() / <span class="hljs-number">1000</span>),
-          oauth_signature_method: <span class="hljs-string">'HMAC-SHA1'</span>,
-          oauth_version: <span class="hljs-string">'1.0'</span>,
-          callback: <span class="hljs-string">'cb'</span>
+    self.loadContent = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">hotel</span>) </span>{
+        <span class="hljs-keyword">var</span>  yelpParams = {
+                    <span class="hljs-string">"hotel"</span>: hotel.id,
         };
-        <span class="hljs-keyword">var</span> encodedSignature = oauthSignature.generate(<span class="hljs-string">'GET'</span>,
-                                                        yelpUrl,
-                                                        parameters,
-                                                        auth.CONSUMER_SECRET,
-                                                        auth.TOKEN_SECRET);
-        parameters.oauth_signature = encodedSignature;
+        <span class="hljs-keyword">var</span>  twitterParams = {
+            <span class="hljs-string">"screen_name"</span>: hotel.twitter,
+            <span class="hljs-string">"count"</span>: <span class="hljs-number">50</span>
+        };
+        <span class="hljs-keyword">var</span> yelpRequest;
+        <span class="hljs-keyword">var</span> twitterRequest;
 
-        $jsonp.send(yelpUrl, {
-            callbackName: <span class="hljs-string">'cb'</span>,
-            data: parameters,
-            onSuccess: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">json</span>)</span>{
-                hotel.content = self.getTemplate(hotel.name,
-                                                 hotel.diamonds,
-                                                 json.image_url,
-                                                 json.snippet_text,
-                                                 json.url);
-                self.infoWindow.setContent(hotel.content);
-            },
-            onTimeout: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-                hotel.content = <span class="hljs-literal">null</span>;
-                self.infoWindow.setContent(<span class="hljs-string">'Error retrieving Yelp data.&lt;br&gt;Please try again.'</span>);
-            },
-                timeout: <span class="hljs-number">5</span>
-        });
-
-    }; <span class="hljs-comment">// getContent</span>
-
-    <span class="hljs-comment">/**
-     * Matches the icon to diamond rating and formats html for the hotel image and review snippet.
-     *
-     * @function app.MapView.getTemplate
-     * @memberof app.MapView
-     * @returns {string} - HTML containing hotel name, diamond rating, image, and review.
-     */</span>
-    self.getTemplate = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name, diamonds, image, review, url</span>) </span>{
-        <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>;
-        <span class="hljs-keyword">var</span> d = app.vm.getRatings();
-        <span class="hljs-keyword">var</span> dlength = d.length;
-        <span class="hljs-keyword">var</span> template = <span class="hljs-string">''</span>;
-        <span class="hljs-keyword">var</span> icon = <span class="hljs-string">''</span>;</pre></div></div>
+        <span class="hljs-keyword">if</span>(!hotel.content) {</pre></div></div>
             
         </li>
         
@@ -507,6 +449,144 @@ For real world use you’d want a backend that hides your keys</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Show preload text inside the Info Window</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            self.infoWindow.setContent(self.preload);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>Send GET request to Yelp API</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            yelpRequest = getJSON(<span class="hljs-string">'https://widgets.ws/yelp/api.php'</span>, {
+                method: <span class="hljs-string">'GET'</span>,
+                apiquery: yelpParams,
+            })
+            .then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">json</span>) </span>{
+                hotel.review = self.getYelpTemplate(hotel.name,
+                                                hotel.diamonds,
+                                                json[<span class="hljs-number">0</span>].image_url,
+                                                json[<span class="hljs-number">1</span>].reviews[<span class="hljs-number">0</span>].text,
+                                                json[<span class="hljs-number">1</span>].reviews[<span class="hljs-number">0</span>].url);
+                self.infoWindow.setContent(hotel.review);
+                hotel.content = <span class="hljs-literal">true</span>;
+                <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-string">'Yelp API Success'</span>);
+            })
+            .catch(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) </span>{
+                hotel.content = <span class="hljs-literal">null</span>;
+                self.infoWindow.setContent(<span class="hljs-string">'Error retrieving Yelp data.&lt;br&gt;Please try again.'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Ref: <a href="https://medium.com/datafire-io/es6-promises-patterns-and-anti-patterns-bbb21a5d0918">https://medium.com/datafire-io/es6-promises-patterns-and-anti-patterns-bbb21a5d0918</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.reject(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Yelp API: "</span> + error.status + <span class="hljs-string">" "</span> + error.statusText));
+            });
+
+        } <span class="hljs-keyword">else</span>
+            self.infoWindow.setContent(hotel.review);
+
+        <span class="hljs-keyword">if</span>(!hotel.tweets) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Send GET request to Twitter API</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            twitterRequest = getJSON(<span class="hljs-string">'https://widgets.ws/twitter/api.php'</span>, {
+                method: <span class="hljs-string">'GET'</span>,
+                apiquery: twitterParams,
+            })
+            .then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">json</span>) </span>{
+                hotel.tweets = self.getTweets(hotel, json);
+                self.displayTweets(hotel.tweets);
+                <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-string">'Twitter API Success'</span>);
+            })
+            .catch(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) </span>{
+                <span class="hljs-keyword">var</span> url = <span class="hljs-string">'https://twitter.com/'</span> + hotel.twitter;
+                <span class="hljs-keyword">var</span> msg = <span class="hljs-string">'&lt;li&gt;&lt;a href="'</span> + url + <span class="hljs-string">'" target="_blank"&gt;Failed to load recent tweets for @'</span>;
+                    msg += hotel.twitter + <span class="hljs-string">'. Click here to view tweets on twitter.com.&lt;/a&gt;&lt;/li&gt;'</span>;
+                hotel.tweets = <span class="hljs-literal">null</span>;
+                self.displayTweets(msg);
+                <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.reject(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Twitter API: "</span> + error.status + <span class="hljs-string">" "</span> + error.statusText));
+            });
+        } <span class="hljs-keyword">else</span>
+            self.displayTweets(hotel.tweets);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>Track when all the API requests are complete using Promise.all and catch any errors
+Ref: <a href="http://adampaxton.com/handling-multiple-javascript-promises-even-if-some-fail/">http://adampaxton.com/handling-multiple-javascript-promises-even-if-some-fail/</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-built_in">Promise</span>.all([yelpRequest, twitterRequest])
+        .then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">res</span>) </span>{
+            <span class="hljs-keyword">if</span>(<span class="hljs-built_in">window</span>.console) <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'GET request results'</span>, res);
+        })
+        .catch(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
+            <span class="hljs-keyword">if</span>(<span class="hljs-built_in">window</span>.console) <span class="hljs-built_in">console</span>.error(<span class="hljs-string">'GET request failed with'</span>, err);
+        });
+
+    }; <span class="hljs-comment">// loadContent</span>
+
+    <span class="hljs-comment">/**
+     * Matches the icon to diamond rating and formats html for the hotel image and review snippet.
+     *
+     * @function app.MapView.getYelpTemplate
+     * @memberof app.MapView
+     * @returns {string} - HTML containing hotel name, diamond rating, image, and review.
+     */</span>
+    self.getYelpTemplate = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name, diamonds, image, review, url</span>) </span>{
+        <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">var</span> d = app.vm.getRatings();
+        <span class="hljs-keyword">var</span> dlength = d.length;
+        <span class="hljs-keyword">var</span> template = <span class="hljs-string">''</span>;
+        <span class="hljs-keyword">var</span> icon = <span class="hljs-string">''</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Match the diamond rating to the icon text</p>
 
@@ -530,7 +610,7 @@ For real world use you’d want a backend that hides your keys</p>
         template += <span class="hljs-string">'&lt;/div&gt;'</span>;
 
         <span class="hljs-keyword">return</span> template;
-    }; <span class="hljs-comment">// getTemplate</span>
+    }; <span class="hljs-comment">// getYelpTemplate</span>
 
     <span class="hljs-comment">/**
      * Sends a GET request to api.php which accesses the Twitter API and returns JSON data.
@@ -539,34 +619,29 @@ For real world use you’d want a backend that hides your keys</p>
      * @memberof app.MapView
      * @return {object} - JSON of the user's timeline
      */</span>
-    self.getTweets = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">hotel</span>) </span>{
-        <span class="hljs-keyword">var</span> twitter_api_wrapper = <span class="hljs-string">'http://topwidget.co/twitter/api.php'</span>;
-        <span class="hljs-keyword">var</span> data = {
-            <span class="hljs-string">"screen_name"</span>: hotel.twitter,
-            <span class="hljs-string">"count"</span>: <span class="hljs-number">5</span>
-        };</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
-              </div>
-              <p>url, method, data, success, fail</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        AJAX.request(twitter_api_wrapper, <span class="hljs-string">'GET'</span>, data, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">response</span>) </span>{
+    self.getTweets = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">hotel, response</span>) </span>{
             <span class="hljs-keyword">var</span> tweets = <span class="hljs-string">''</span>;
             <span class="hljs-keyword">var</span> length = response.length;
             <span class="hljs-keyword">var</span> t = <span class="hljs-number">0</span>;
             <span class="hljs-keyword">var</span> txt = <span class="hljs-string">''</span>;
             <span class="hljs-keyword">var</span> img = <span class="hljs-string">''</span>;
             <span class="hljs-keyword">var</span> id = <span class="hljs-string">''</span>;
-            <span class="hljs-keyword">var</span> url = <span class="hljs-string">'https://twitter.com/'</span> + hotel.twitter + <span class="hljs-string">'/status/'</span>;
+            <span class="hljs-keyword">var</span> url = <span class="hljs-string">'https://twitter.com/'</span> + hotel.twitter + <span class="hljs-string">'/status/'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Limit to 5 tweets</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (length &gt; <span class="hljs-number">5</span>) length = <span class="hljs-number">5</span>;
 
             <span class="hljs-keyword">for</span>(t; t &lt; length; t++) {
                 id = response[t].id_str;
@@ -579,17 +654,7 @@ For real world use you’d want a backend that hides your keys</p>
                 tweets += <span class="hljs-string">'&lt;/li&gt;'</span>;
             } <span class="hljs-comment">// for</span>
 
-            hotel.tweets = tweets;
-            self.displayTweets(hotel.tweets);
-
-        },<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-            <span class="hljs-keyword">var</span> url = <span class="hljs-string">'https://twitter.com/'</span> + hotel.twitter;
-            <span class="hljs-keyword">var</span> msg = <span class="hljs-string">'&lt;li&gt;&lt;a href="'</span> + url + <span class="hljs-string">'" target="_blank"&gt;Failed to load recent tweets for @'</span>;
-                msg += hotel.twitter + <span class="hljs-string">'. Click here to view tweets on twitter.com.&lt;/a&gt;&lt;/li&gt;'</span>;
-            hotel.tweets = <span class="hljs-literal">null</span>;
-            self.displayTweets(msg);
-            <span class="hljs-keyword">if</span>(<span class="hljs-built_in">window</span>.console) <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"AJAX GET request failed."</span>);
-        });
+            <span class="hljs-keyword">return</span> tweets;
 
     }; <span class="hljs-comment">// getTweets</span>
 

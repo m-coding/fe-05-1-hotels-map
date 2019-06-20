@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>xhrPromise.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="Hotel.html">
+                  Hotel.js
+                </a>
+              
+                
+                <a class="source" href="MapView.html">
+                  MapView.js
+                </a>
+              
+                
+                <a class="source" href="ViewModel.html">
+                  ViewModel.js
+                </a>
+              
+                
+                <a class="source" href="app.html">
+                  app.js
+                </a>
+              
+                
+                <a class="source" href="xhrPromise.html">
+                  xhrPromise.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>xhrPromise.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/**
+ * A Promise based XHR function to get JSON data from external APIs
+ *
+ * Browser compatibility: Chrome, Edge, Firefox, Opera, Safari
+ * Internet Explorer does not support the Promise object natively
+ *
+ * Inspired by Chris Ferdinandi's atomic plugin:
+ * @see https://github.com/cferdinandi/atomic
+ * @see https://gomakethings.com/promise-based-xhr/
+ *
+ * @param {String} url - The request URL
+ * @param {Object} options - A set of options for the request
+ * @return {Promise} - The XHR request Promise
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getJSON</span> (<span class="hljs-params">url, options</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Create the XHR request</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> request = <span class="hljs-keyword">new</span> XMLHttpRequest();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Setup the Promise</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> xhrPromise = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>( (resolve, reject) =&gt; {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>References: How to use ES6 Arrow Functions
+<a href="https://exploringjs.com/es6/ch_arrow-functions.html">https://exploringjs.com/es6/ch_arrow-functions.html</a>
+<a href="https://javascriptplayground.com/real-life-es6-arrow-fn/">https://javascriptplayground.com/real-life-es6-arrow-fn/</a>
+<a href="https://medium.com/@philipaffulnunoo/javascript-es6-arrow-functions-2d1eedaec2b7">https://medium.com/@philipaffulnunoo/javascript-es6-arrow-functions-2d1eedaec2b7</a>
+<a href="https://gist.github.com/micjamking/6e9886609d40653b3aef107845589744">https://gist.github.com/micjamking/6e9886609d40653b3aef107845589744</a></p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Setup our listener to process compeleted requests</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        request.onreadystatechange = () =&gt; {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Only run if the request is complete
+Reference: <a href="https://xhr.spec.whatwg.org/#dom-xmlhttprequest-readystate">https://xhr.spec.whatwg.org/#dom-xmlhttprequest-readystate</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (request.readyState !== <span class="hljs-number">4</span>) <span class="hljs-keyword">return</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Process the response</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (request.status &gt;= <span class="hljs-number">200</span> &amp;&amp; request.status &lt; <span class="hljs-number">300</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>If successful, resolve the promise by passing back the request response</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                resolve(request.response);
+            } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>If it fails, reject the promise</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                reject({
+                    status: request.status,
+                    statusText: request.statusText
+                });
+            }
+
+        };
+
+        request.onerror = () =&gt; {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Reference: <a href="https://github.com/mdn/js-examples/tree/master/promises-test">https://github.com/mdn/js-examples/tree/master/promises-test</a>
+Also deal with the case when the entire request fails to begin with
+This is probably a network error, so reject the promise with an appropriate message</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            reject(<span class="hljs-built_in">Error</span>(<span class="hljs-string">'There was a network error.'</span>));
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Convert the API params object to a serialized query string</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> query = options.apiquery;
+        <span class="hljs-keyword">if</span>(query !== <span class="hljs-literal">null</span>) {
+            <span class="hljs-keyword">var</span> query = <span class="hljs-string">"?"</span> + <span class="hljs-built_in">Object</span>
+                .keys(query)
+                .map(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">key</span>)</span>{
+                  <span class="hljs-keyword">return</span> key+<span class="hljs-string">"="</span>+<span class="hljs-built_in">encodeURIComponent</span>(query[key]);
+                })
+                .join(<span class="hljs-string">"&amp;"</span>);
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Setup our HTTP request</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        request.open(options.method, url + query, <span class="hljs-literal">true</span>); <span class="hljs-comment">// method, url, async</span>
+        request.responseType = <span class="hljs-string">'json'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Send the request</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        request.send();
+
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Return the request as a Promise</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> xhrPromise;
+
+} <span class="hljs-comment">// getJSON</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
