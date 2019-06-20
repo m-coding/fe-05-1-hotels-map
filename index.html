@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Las Vegas Diamond Hotels</title>
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/styles.min.css">
+  </head>
+  <body>
+
+    <header>
+      <h1>Las Vegas Diamond Hotels</h1>
+      <nav class="top">
+        <i data-bind="click: slideIn" class="icons icon-menu big"></i>
+        <!-- Twitter Ticker -->
+        <div id="tickerContainer">
+          <div id="ticker" data-bind="visible: showTicker">
+            <ul id="twitter" data-bind="html: hotelTweets"></ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <aside id="slide" data-bind="attr: { class: slideClass }">
+        <h2>Filter By:</h2><i data-bind="click: slideOut" id="menuClose" class="icons icon-close big right"></i>
+
+        <!-- Hotel Name -->
+        <h3 data-bind="click: toggleName"><i data-bind="css: showName() ? 'icons icon-down' : 'icons icon-right'"></i>Hotel Name</h3>
+        <form data-bind="submit: noEnter, style: { display: showName() ? 'block' : 'none'}">
+          <i class="icons icon-search"></i>
+          <input type="text" data-bind="textInput: filterText, valueUpdate: 'keyup'" placeholder=" enter keywords">
+        </form>
+
+        <!-- Diamond Rating -->
+        <h3 data-bind="click: toggleRating"><i data-bind="css: showRating() ? 'icons icon-down' : 'icons icon-right'"></i>Diamond Rating</h3>
+        <ul class="ratings" data-bind="style: { display: showRating() ? 'block' : 'none'}">
+          <li id="about" data-bind="click: toggleDef"><i class="icons icon-info"></i>About Diamond Ratings</li>
+          <!-- Knockout Info:
+            checkedValue = Value of the checkbox, i.e. "5"
+            checked = KO saves the checkbox value to the array "ratingsChecked" and removes it if un-checked
+          -->
+          <!-- ko foreach: ratings -->
+          <li data-bind="attr: { class: color}"><input data-bind="checkedValue: ratingValue, checked: $root.ratingsChecked, click: $root.filterRatings" class="rbox" type="checkbox"> <i data-bind="text: icon" class="diamonds"></i></li>
+          <!-- /ko -->
+          <li>Source: <a href="http://newsroom.aaa.com/diamond-ratings/" title="AAA Diamond Rated Hotels">AAA</a></li>
+        </ul>
+
+        <!-- Diamond Rating Definitions -->
+        <ul id="definitions" data-bind="style: { display: showDef() ? 'block' : ''}">
+          <li data-bind="click: toggleDef"><i class="icons icon-close"></i>Close</li>
+          <li><p><i class="icons icon-info"></i>AAA Diamond ratings for hotels represent a combination of the overall quality, range of facilities, and level of services offered by the property. The descriptive ratings are assigned exclusively to properties that meet and uphold AAA’s rigorous Approval standards.</p></li>
+          <li><p><i class="diamonds">aaaaa</i><br>
+          Ultimate luxury, sophistication and comfort with extraordinary physical attributes, meticulous personalized service, extensive amenities and impeccable standards of excellence.</p></li>
+          <li><p><i class="diamonds">aaaa</i><br>
+          Refined, stylish with upscale physical attributes, extensive amenities and high degree of hospitality, service and attention to detail.</p></li>
+          <li><p><i class="diamonds">aaa</i><br>
+          Distinguished, multi-faceted with enhanced physical attributes, amenities and guest comforts.</p></li>
+          <li><p><i class="diamonds">aa</i><br>
+          Affordable, with modestly enhanced facilities, decor and amenities.</p></li>
+          <li><p><i class="diamonds">a</i><br>
+          Budget-oriented, offering basic comfort and hospitality</p></li>
+          <li><p>Source: <a href="http://newsroom.aaa.com/diamond-ratings/diamond-rating-definitions/">AAA Diamond Rating Definitions</a></p></li>
+        </ul>
+
+        <!-- Hotel List -->
+        <h3 data-bind="click: toggleList"><i data-bind="css: showList() ? 'icons icon-down' : 'icons icon-right'"></i>Hotel List</h3>
+        <ul data-bind="foreach: hotelDisplay(), style: { display: showList() ? 'block' : 'none'}">
+          <li data-bind="text: name, click: $root.gotoHotel"></li>
+        </ul>
+      </aside>
+
+      <!-- Google Map -->
+      <!-- ko ifnot: timeout -->
+      <figure id="map">
+          <figcaption id="spinnerContainer">
+              Loading Map <div id="spinner"></div> Please Wait
+          </figcaption>
+      </figure>
+      <!-- /ko -->
+
+      <!-- ko if: timeout -->
+      <figure id="map" data-bind="html: dispMsg"></figure>
+      <!-- /ko -->
+    </main>
+
+    <script src="js/app.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-app.js" onerror="app.errorHandler('Firebase')"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-firestore.js" onerror="app.errorHandler('Firestore')"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js" onerror="app.errorHandler('knockout')"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpx555oZLZBIBlnLV6dLMY2ORJM6ULQZ0&callback=app.init" onerror="app.errorHandler('googlemap')"></script>
+  </body>
+</html>

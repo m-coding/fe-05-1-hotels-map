@@ -1,0 +1,17 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>Copyright (C) 2016 by original authors @ fontello.com</metadata>
+<defs>
+<font id="map" horiz-adv-x="1000" >
+<font-face font-family="map" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
+<missing-glyph horiz-adv-x="1000" />
+<glyph glyph-name="menu" unicode="&#xe800;" d="M68 62q0-30 21-51t51-21h793q30 0 51 21t21 51-21 51-51 21h-793q-29 0-51-21t-21-51z m0 288q0-30 21-51t51-21h793q30 0 51 21t21 51-21 51-51 21h-793q-29 0-51-21t-21-51z m0 288q0-30 21-51t51-21h793q30 0 51 21t21 51-21 51-51 21h-793q-29 0-51-21t-21-51z" horiz-adv-x="1073.2" />
+<glyph glyph-name="info" unicode="&#xe801;" d="M469 78l0 349-121 0 0-349 121 0z m-61 410c40 0 71 31 71 72 0 39-31 70-71 70s-72-31-72-70c0-40 32-72 72-72z m-2 269c224 0 407-182 407-407 0-223-183-406-407-406-225 0-406 183-406 406 0 225 181 407 406 407z" horiz-adv-x="813" />
+<glyph glyph-name="down" unicode="&#xe802;" d="M265 84l-265 530h529z" horiz-adv-x="529" />
+<glyph glyph-name="right" unicode="&#xe804;" d="M529 349l-529-265v530z" horiz-adv-x="529" />
+<glyph glyph-name="search" unicode="&#xe808;" d="M746 209l254-255-105-105-254 254q-106-72-232-72-169 0-289 120t-120 289 120 289 289 120 289-120 120-289q0-127-72-231z m-65 231q0 113-79 193t-193 80-193-80-80-193 80-192 193-80 193 80 79 192z" horiz-adv-x="1000" />
+<glyph glyph-name="close" unicode="&#xe80f;" d="M700 750q42 0 71-29t29-71l0-600q0-40-29-70t-71-30l-600 0q-40 0-70 30t-30 70l0 600q0 42 30 71t70 29l600 0z m-146-638l86 86-154 152 154 154-86 86-154-152-152 152-88-86 154-154-154-152 88-86 152 152z" horiz-adv-x="800" />
+</font>
+</defs>
+</svg>
