@@ -4,10 +4,9 @@ var gulp = require('gulp'),
     del = require('del'),
     eslint = require('gulp-eslint'),
     cssnano = require('gulp-cssnano'),
-    uglify = require('gulp-uglify'),
+    terser = require('gulp-terser'),
     useref = require('gulp-useref'),
     gulpif = require('gulp-if');
-
 
 /** Default **/
 gulp.task('default', ['lint', 'replace-html', 'copy-fonts', 'copy-images']);
@@ -40,7 +39,7 @@ gulp.task('replace-html', ['lint'], function() {
     return gulp.src('public/src/index.html')
         .pipe(useref())
         .pipe(gulpif('*.css', cssnano()))
-        .pipe(gulpif('*.js', uglify()))
+        .pipe(gulpif('*.js', terser()))
         .pipe(gulp.dest('public/dist'));
 });
 
