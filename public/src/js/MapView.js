@@ -157,7 +157,7 @@ app.MapView = function() {
         };
         var  twitterParams = {
             "screen_name": hotel.twitter,
-            "count": 5
+            "count": 50
         };
         var yelpRequest;
         var twitterRequest;
@@ -276,8 +276,8 @@ app.MapView = function() {
             var id = '';
             var url = 'https://twitter.com/' + hotel.twitter + '/status/';
 
-            console.info(hotel.twitter);
-            console.info("length: ", length);
+            // Limit to 5 tweets
+            if (length > 5) length = 5;
 
             for(t; t < length; t++) {
                 id = response[t].id_str;
@@ -290,7 +290,6 @@ app.MapView = function() {
                 tweets += '</li>';
             } // for
 
-            console.info(tweets);
             return tweets;
 
     }; // getTweets
