@@ -129,16 +129,8 @@ app.MapView = function() {
         // Open the infoWindow when a marker is clicked
         google.maps.event.addListener(hotel.marker, 'click', function() {
 
-            if(!hotel.content) {
-                // Show preload text inside the Info Window
-                self.infoWindow.setContent(self.preload);
-
-                // Load Yelp and Twitter content
-                self.loadContent(hotel);
-            } else {
-                self.infoWindow.setContent(hotel.review);
-                self.displayTweets(hotel.tweets);
-            }
+            // Load Yelp and Twitter content
+            self.loadContent(hotel);
 
             self.infoWindow.open(self.map, hotel.marker);
             self.animateMarker(hotel);
@@ -160,56 +152,66 @@ app.MapView = function() {
      * @memberof app.MapView
      */
     self.loadContent = function(hotel) {
-
-         // Send GET request to Yelp API
-        var yelpParams = {
-                "hotel": hotel.id,
+        var  yelpParams = {
+                    "hotel": hotel.id,
         };
-
-        var yelpRequest = getJSON('https://widgets.ws/yelp/api.php', {
-            method: 'GET',
-            apiquery: yelpParams,
-        })
-        .then(function (json) {
-            hotel.review = self.getYelpTemplate(hotel.name,
-                                            hotel.diamonds,
-                                            json[0].image_url,
-                                            json[1].reviews[0].text,
-                                            json[1].reviews[0].url);
-            self.infoWindow.setContent(hotel.review);
-            hotel.content = true;
-            return Promise.resolve('Yelp API Success');
-        })
-        .catch(function (error) {
-            hotel.content = null;
-            self.infoWindow.setContent('Error retrieving Yelp data.<br>Please try again.');
-            // Ref: https://medium.com/datafire-io/es6-promises-patterns-and-anti-patterns-bbb21a5d0918
-            return Promise.reject(new Error("Yelp API: " + error.status + " " + error.statusText));
-        });
-
-        // Send GET request to Twitter API
-        var twitterParams = {
+        var  twitterParams = {
             "screen_name": hotel.twitter,
             "count": 5
         };
+        var yelpRequest;
+        var twitterRequest;
 
-        var twitterRequest = getJSON('https://widgets.ws/twitter/api.php', {
-            method: 'GET',
-            apiquery: twitterParams,
-        })
-        .then(function (json) {
-            hotel.tweets = self.getTweets(hotel, json);
+        if(!hotel.content) {
+            // Show preload text inside the Info Window
+            self.infoWindow.setContent(self.preload);
+
+            // Send GET request to Yelp API
+            yelpRequest = getJSON('https://widgets.ws/yelp/api.php', {
+                method: 'GET',
+                apiquery: yelpParams,
+            })
+            .then(function (json) {
+                hotel.review = self.getYelpTemplate(hotel.name,
+                                                hotel.diamonds,
+                                                json[0].image_url,
+                                                json[1].reviews[0].text,
+                                                json[1].reviews[0].url);
+                self.infoWindow.setContent(hotel.review);
+                hotel.content = true;
+                return Promise.resolve('Yelp API Success');
+            })
+            .catch(function (error) {
+                hotel.content = null;
+                self.infoWindow.setContent('Error retrieving Yelp data.<br>Please try again.');
+                // Ref: https://medium.com/datafire-io/es6-promises-patterns-and-anti-patterns-bbb21a5d0918
+                return Promise.reject(new Error("Yelp API: " + error.status + " " + error.statusText));
+            });
+
+        } else
+            self.infoWindow.setContent(hotel.review);
+
+        if(!hotel.tweets) {
+            // Send GET request to Twitter API
+            twitterRequest = getJSON('https://widgets.ws/twitter/api.php', {
+                method: 'GET',
+                apiquery: twitterParams,
+            })
+            .then(function (json) {
+                hotel.tweets = self.getTweets(hotel, json);
+                self.displayTweets(hotel.tweets);
+                return Promise.resolve('Twitter API Success');
+            })
+            .catch(function (error) {
+                var url = 'https://twitter.com/' + hotel.twitter;
+                var msg = '<li><a href="' + url + '" target="_blank">Failed to load recent tweets for @';
+                    msg += hotel.twitter + '. Click here to view tweets on twitter.com.</a></li>';
+                hotel.tweets = null;
+                self.displayTweets(msg);
+                return Promise.reject(new Error("Twitter API: " + error.status + " " + error.statusText));
+            });
+        } else
             self.displayTweets(hotel.tweets);
-            return Promise.resolve('Twitter API Success');
-        })
-        .catch(function (error) {
-            var url = 'https://twitter.com/' + hotel.twitter;
-            var msg = '<li><a href="' + url + '" target="_blank">Failed to load recent tweets for @';
-                msg += hotel.twitter + '. Click here to view tweets on twitter.com.</a></li>';
-            hotel.tweets = null;
-            self.displayTweets(msg);
-            return Promise.reject(new Error("Twitter API: " + error.status + " " + error.statusText));
-        });
 
         // Track when all the API requests are complete using Promise.all and catch any errors
         // Ref: http://adampaxton.com/handling-multiple-javascript-promises-even-if-some-fail/
@@ -274,6 +276,9 @@ app.MapView = function() {
             var id = '';
             var url = 'https://twitter.com/' + hotel.twitter + '/status/';
 
+            console.info(hotel.twitter);
+            console.info("length: ", length);
+
             for(t; t < length; t++) {
                 id = response[t].id_str;
                 txt = response[t].text;
@@ -285,6 +290,7 @@ app.MapView = function() {
                 tweets += '</li>';
             } // for
 
+            console.info(tweets);
             return tweets;
 
     }; // getTweets
