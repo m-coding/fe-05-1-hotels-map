@@ -27,7 +27,7 @@ app.MapView = function() {
     self.preload = '<div class="preload">Loading...<div class="spin"></div></div>';
 
     // Source: https://sites.google.com/site/gmapsdevelopment/
-    self.markerUrl = 'http://maps.google.com/mapfiles/ms/icons/';
+    self.markerUrl = 'https://maps.google.com/mapfiles/ms/icons/';
     self.markerColors = ['pink', 'blue', 'purple', 'green', 'yellow', 'red'];
     self.bounds = new google.maps.LatLngBounds();
 
